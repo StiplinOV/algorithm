@@ -1,5 +1,3 @@
-package ru.stiplin.alghoritms;
-
 public class BinaryIndexedTree {
 
     long[] btree;
