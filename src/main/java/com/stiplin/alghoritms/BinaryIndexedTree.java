@@ -1,3 +1,5 @@
+package com.stiplin.alghoritms;
+
 public class BinaryIndexedTree {
 
     long[] btree;
@@ -6,20 +8,20 @@ public class BinaryIndexedTree {
         this.btree = new long[size];
     }
 
-    BinaryIndexedTree(int size, long[] initValues) {
-        this(size);
+    BinaryIndexedTree(long... initValues) {
+        this(initValues.length);
         for (int i = 0; i < initValues.length; i++) {
             this.setValue(i, initValues[i]);
         }
     }
 
-    long get(int index) {
+    public long get(int index) {
         long result = this.getSum(index);
 
         return index > 0 ? result - getSum(index - 1) : result;
     }
 
-    void setValue(int index, long value) {
+    public void setValue(int index, long value) {
         long oldValue = this.get(index);
         long difference = value - oldValue;
         while (index < btree.length) {
@@ -28,7 +30,7 @@ public class BinaryIndexedTree {
         }
     }
 
-    long getSum(int toIndexInclusive) {
+    public long getSum(int toIndexInclusive) {
         long result = 0;
         while (toIndexInclusive >= 0) {
             result += btree[toIndexInclusive];
