@@ -2,13 +2,13 @@ package com.stiplin.alghoritms;
 
 public class BinaryIndexedTree {
 
-    long[] btree;
+    private final long[] btree;
 
-    BinaryIndexedTree(int size) {
+    public BinaryIndexedTree(int size) {
         this.btree = new long[size];
     }
 
-    BinaryIndexedTree(long... initValues) {
+    public BinaryIndexedTree(long... initValues) {
         this(initValues.length);
         for (int i = 0; i < initValues.length; i++) {
             this.setValue(i, initValues[i]);
@@ -30,7 +30,18 @@ public class BinaryIndexedTree {
         }
     }
 
+    public long getSum(int fromIndexInclusive, int toIndexInclusive) {
+        if (fromIndexInclusive > toIndexInclusive) {
+            throw new IllegalArgumentException("from index more than to index");
+        }
+        long leftSum = fromIndexInclusive > 0 ? this.getSum(fromIndexInclusive - 1) : 0;
+        return this.getSum(toIndexInclusive) - leftSum;
+    }
+
     public long getSum(int toIndexInclusive) {
+        if (toIndexInclusive >= btree.length) {
+            throw new IllegalArgumentException("to index more than btree length");
+        }
         long result = 0;
         while (toIndexInclusive >= 0) {
             result += btree[toIndexInclusive];
