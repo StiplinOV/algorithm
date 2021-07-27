@@ -9,6 +9,7 @@ public class BinaryIndexedTree {
     }
 
     public BinaryIndexedTree(long... initValues) {
+        //TODO need to optimize init
         this(initValues.length);
         for (int i = 0; i < initValues.length; i++) {
             this.setValue(i, initValues[i]);
