@@ -1,7 +1,6 @@
 package com.stiplin.alghoritms;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,12 +18,12 @@ class SuffixTreeNode {
         return children.get(character);
     }
 
-    SuffixTreeEdge putChild(char character, int left, int right) {
-        return this.putChild(character, new SuffixTreeEdge(left, right));
+    void putChild(char character, int left, int right) {
+        this.putChild(character, new SuffixTreeEdge(left, right));
     }
 
-    SuffixTreeEdge putChild(char character, SuffixTreeEdge child) {
-        return this.children.put(character, child);
+    void putChild(char character, SuffixTreeEdge child) {
+        this.children.put(character, child);
     }
 
     boolean hasSuffixLink() {
@@ -51,18 +50,11 @@ class SuffixTreeNode {
         return children.keySet();
     }
 
-    @Override
-    public String toString() {
-        return this.children.isEmpty() ? "TERMINAL" : "SuffixTreeNode{" +
-                "children=" + children +
-                ", suffixLink=" + (suffixLink == null ? "null" : suffixLink.hashCode()) +
-                '}';
-    }
 }
 
 class SuffixTreeEdge {
 
-    private int left;
+    private final int left;
 
     private int right;
 
@@ -118,10 +110,6 @@ class SuffixTreeEdge {
         return newDest;
     }
 
-    @Override
-    public String toString() {
-        return "SuffixTreeEdge{[" + left + ";" + right + "], dest=" + dest + '}';
-    }
 }
 
 class Position {
@@ -161,12 +149,7 @@ class Position {
         if (leaveCharacter == null) {
             return node.hasChild(character);
         } else {
-            SuffixTreeEdge edge = node.getChild(leaveCharacter);
-            if (edge.getRight() > edgePosition) {
-                return source.charAt(edgePosition + 1) == character;
-            } else {
-                return edge.getDest().hasChild(character);
-            }
+            return source.charAt(edgePosition + 1) == character;
         }
     }
 
@@ -178,10 +161,6 @@ class Position {
             SuffixTreeEdge edge = node.getChild(leaveCharacter);
             if (edge.getRight() >= edgePosition) {
                 edgePosition++;
-            } else {
-                node = edge.getDest();
-                edgePosition = node.getChild(character).getLeft();
-                leaveCharacter = character;
             }
         }
 
@@ -230,15 +209,25 @@ public class SuffixTreeFactory {
                     SuffixTreeEdge edge = currentPosition.getEdge();
                     SuffixTreeNode newNode = edge.split(str.charAt(currentPosition.getEdgePosition() + 1), currentPosition.getEdgePosition());
                     newNode.putChild(currentChar, i, str.length() - 1);
-                    currentPosition.setNode(newNode);
+                    currentPosition.setNode(prevNode);
+                    int right = edge.getRight();
                     if (prevNode == root) {
-                        currentPosition.setNode(root);
-                        int right = edge.getRight();
                         for (int j = edge.getLeft() + 1; j <= right && edge.getLength() > 1; j++) {
-//                            if (prevNode != root) {
-//                                prevNode = prevNode.getSuffixLink();
-//                            }
-
+                            for (int k = j; k <= right; k++) {
+                                currentPosition.move(str.charAt(k));
+                            }
+                            newNode.setSuffixLink(currentPosition.getEdge().split(str.charAt(currentPosition.edgePosition + 1), currentPosition.edgePosition));
+                            newNode = newNode.getSuffixLink();
+                            newNode.putChild(currentChar, i, str.length() - 1);
+                            currentPosition.setNode(root);
+                        }
+                        newNode.setSuffixLink(root);
+                        root.putChild(currentChar, i, str.length() - 1);
+                    } else {
+                        for (int j = edge.getLeft(); j <= right; j++) {
+                            if (prevNode != root) {
+                                prevNode = prevNode.getSuffixLink();
+                            }
                             for (int k = j; k <= right; k++) {
                                 currentPosition.move(str.charAt(k));
                             }
@@ -249,32 +238,8 @@ public class SuffixTreeFactory {
                             }
                             newNode = newNode.getSuffixLink();
                             newNode.putChild(currentChar, i, str.length() - 1);
-                            currentPosition.setNode(root);
                         }
-
-
-                        newNode.setSuffixLink(root);
-                        root.putChild(currentChar, i, str.length() - 1);
-                        currentPosition.setNode(root);
-                    } else {
-                        for (int j = edge.getLeft(); j <= edge.getRight(); j++) {
-                            if (prevNode != root) {
-                                prevNode = prevNode.getSuffixLink();
-                            }
-                            currentPosition.setNode(prevNode);
-                            for (int k = j; k <= edge.getRight(); k++) {
-                                currentPosition.move(str.charAt(k));
-                            }
-                            if (currentPosition.isNodePosition()) {
-                                newNode.setSuffixLink(currentPosition.getNode());
-                            } else {
-                                newNode.setSuffixLink(currentPosition.getEdge().split(str.charAt(currentPosition.edgePosition + 1), currentPosition.edgePosition));
-                            }
-                            newNode = newNode.getSuffixLink();
-                            newNode.putChild(currentChar, i, str.length() - 1);
-                            currentPosition.setNode(prevNode);
-                            edge = prevNode.getChild(str.charAt(j));
-                        }
+                        currentPosition.setNode(prevNode);
                         root.putChild(currentChar, i, str.length() - 1);
                     }
                 }
