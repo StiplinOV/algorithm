@@ -325,7 +325,20 @@ public class SuffixTreeFactory {
                 currentPosition.move(currentChar);
             } else {
                 if (currentPosition.isNodePosition()) {
-                    currentPosition.putChild(i);
+                    Node suffixTreeNode = currentPosition.putChild(i);
+                    if (currentPosition.hasPrevNode()) {
+                        Edge edge = currentPosition.getPrevEdge();
+                        currentPosition.setNode(currentPosition.getPrevNode());
+                        currentPosition = createSuffixLinks(
+                                str,
+                                i,
+                                currentPosition,
+                                suffixTreeNode,
+                                root,
+                                edge.getLeft(),
+                                edge.getRight()
+                        );
+                    }
                     //TODO а если мы не в корне?
                 } else {
                     Node suffixTreeNode = currentPosition.putChild(i);
@@ -336,7 +349,7 @@ public class SuffixTreeFactory {
                             currentPosition,
                             suffixTreeNode,
                             root,
-                            edge.getLeft() + 1,
+                            edge.getLeft(),
                             edge.getRight()
                     );
                 }
@@ -380,6 +393,10 @@ public class SuffixTreeFactory {
             suffixPosition.moveTo(left, right);
             suffixTreeNode.setSuffixLink(suffixPosition.putChild(currentIndex));
 
+            if(suffixPosition.isNodePosition()) {
+                suffixPosition = new Position(str, suffixPosition.getPrevNode(), null, 0);
+            }
+
             if (currentSuffix.hasSuffixLink() || currentSuffix == root) {
                 return createSuffixLinks(str, currentIndex, suffixPosition, suffixTreeNode.getSuffixLink(), root, left, right);
             }
@@ -401,7 +418,7 @@ public class SuffixTreeFactory {
         System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababb"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbab"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbabbabbbbb"), 0));
-//        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
+        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
     }
 
 
