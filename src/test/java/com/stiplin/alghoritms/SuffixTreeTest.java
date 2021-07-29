@@ -8,7 +8,7 @@ public class SuffixTreeTest {
     @Test
     public void test() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
-        SuffixTreeNode root = factory.buildSuffixTree("aaaaa$");
+        SuffixTreeNode root = factory.buildSuffixTree("aaaaa");
 
         Assert.assertEquals(2, root.characters().size());
         Assert.assertTrue(root.hasChild('a'));
@@ -89,7 +89,7 @@ public class SuffixTreeTest {
     @Test
     public void test1() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
-        SuffixTreeNode root = factory.buildSuffixTree("abrashvabracadabra$");
+        SuffixTreeNode root = factory.buildSuffixTree("abrashvabracadabra");
 
         Assert.assertEquals(9, root.characters().size());
         Assert.assertTrue(root.hasChild('a'));
