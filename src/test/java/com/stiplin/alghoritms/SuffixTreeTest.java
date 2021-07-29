@@ -8,14 +8,14 @@ public class SuffixTreeTest {
     @Test
     public void test() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
-        SuffixTreeNode root = factory.buildSuffixTree("aaaaa");
+        Node root = factory.buildSuffixTree("aaaaa");
 
         Assert.assertEquals(2, root.characters().size());
         Assert.assertTrue(root.hasChild('a'));
         Assert.assertTrue(root.hasChild('$'));
         Assert.assertFalse(root.hasSuffixLink());
 
-        SuffixTreeEdge edge = root.getChild('$');
+        Edge edge = root.getChild('$');
         Assert.assertEquals(5, edge.getLeft());
         Assert.assertEquals(5, edge.getRight());
         Assert.assertTrue(edge.getDest().isTerminal());
@@ -23,7 +23,7 @@ public class SuffixTreeTest {
         edge = root.getChild('a');
         Assert.assertEquals(0, edge.getLeft());
         Assert.assertEquals(0, edge.getRight());
-        SuffixTreeNode node1 = edge.getDest();
+        Node node1 = edge.getDest();
 
         Assert.assertEquals(2, node1.characters().size());
         Assert.assertTrue(node1.hasChild('a'));
@@ -38,7 +38,7 @@ public class SuffixTreeTest {
         edge = node1.getChild('a');
         Assert.assertEquals(1, edge.getLeft());
         Assert.assertEquals(1, edge.getRight());
-        SuffixTreeNode node2 = edge.getDest();
+        Node node2 = edge.getDest();
 
         Assert.assertEquals(2, node2.characters().size());
         Assert.assertTrue(node2.hasChild('a'));
@@ -53,7 +53,7 @@ public class SuffixTreeTest {
         edge = node2.getChild('a');
         Assert.assertEquals(2, edge.getLeft());
         Assert.assertEquals(2, edge.getRight());
-        SuffixTreeNode node3 = edge.getDest();
+        Node node3 = edge.getDest();
 
         Assert.assertEquals(2, node3.characters().size());
         Assert.assertTrue(node3.hasChild('a'));
@@ -68,7 +68,7 @@ public class SuffixTreeTest {
         edge = node3.getChild('a');
         Assert.assertEquals(3, edge.getLeft());
         Assert.assertEquals(3, edge.getRight());
-        SuffixTreeNode node4 = edge.getDest();
+        Node node4 = edge.getDest();
 
         Assert.assertEquals(2, node4.characters().size());
         Assert.assertTrue(node4.hasChild('a'));
@@ -89,7 +89,7 @@ public class SuffixTreeTest {
     @Test
     public void test1() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
-        SuffixTreeNode root = factory.buildSuffixTree("abrashvabracadabra");
+        Node root = factory.buildSuffixTree("abrashvabracadabra");
 
         Assert.assertEquals(9, root.characters().size());
         Assert.assertTrue(root.hasChild('a'));
@@ -103,7 +103,7 @@ public class SuffixTreeTest {
         Assert.assertTrue(root.hasChild('$'));
         Assert.assertFalse(root.hasSuffixLink());
 
-        SuffixTreeEdge edge = root.getChild('$');
+        Edge edge = root.getChild('$');
         Assert.assertEquals(18, edge.getLeft());
         Assert.assertEquals(18, edge.getRight());
         Assert.assertTrue(edge.getDest().isTerminal());
@@ -133,9 +133,9 @@ public class SuffixTreeTest {
         Assert.assertEquals(18, edge.getRight());
         Assert.assertTrue(edge.getDest().isTerminal());
 
-        SuffixTreeNode nodeA = root.getChild('a').getDest();
-        SuffixTreeNode nodeB = root.getChild('b').getDest();
-        SuffixTreeNode nodeR = root.getChild('r').getDest();
+        Node nodeA = root.getChild('a').getDest();
+        Node nodeB = root.getChild('b').getDest();
+        Node nodeR = root.getChild('r').getDest();
         Assert.assertEquals(5, nodeA.characters().size());
         Assert.assertTrue(nodeA.hasChild('b'));
         Assert.assertTrue(nodeA.hasChild('s'));
@@ -170,7 +170,7 @@ public class SuffixTreeTest {
         Assert.assertFalse(edge.getDest().isTerminal());
         Assert.assertEquals(nodeA.getSuffixLink(), root);
 
-        SuffixTreeNode nodeAb = edge.getDest();
+        Node nodeAb = edge.getDest();
         Assert.assertEquals(3, nodeR.characters().size());
         Assert.assertTrue(nodeAb.hasChild('s'));
         Assert.assertTrue(nodeAb.hasChild('c'));
