@@ -198,6 +198,9 @@ class Position {
             }
         } else {
             try {
+                if (hasNextNode()) {
+                    return new Position(source, this.getNextNode(), null, 0).canMove(character);
+                }
                 return source.charAt(edgePosition + 1) == character;
             } catch (Throwable ex) {
                 //System.out.println(1);
@@ -254,6 +257,14 @@ class Position {
         return this.getEdge().split(source.charAt(this.getEdgePosition() + 1), this.getEdgePosition());
     }
 
+    boolean hasNextNode() {
+        if (leaveCharacter == null) {
+            return false;
+        }
+        Edge edge = this.getNode().getChild(leaveCharacter);
+        return edge.getRight() == edgePosition;
+    }
+
     Node getNextNode() {
         if (leaveCharacter == null) {
             throw new IllegalStateException();
@@ -276,8 +287,9 @@ class Position {
 
     Node putChild(int index) {
         Node result = this.getNode();
-
-        if (!isNodePosition()) {
+        if(hasNextNode()) {
+            result = getNextNode();
+        } else if (!isNodePosition()) {
             throw new IllegalStateException();
         }
 
@@ -317,86 +329,93 @@ public class SuffixTreeFactory {
         char currentChar = source.charAt(symbolPosition);
         if (currentPosition.canMove(currentChar)) {
             currentPosition.move(currentChar);
+            if(currentPosition.hasNextNode()) {
+                currentPosition.setNode(currentPosition.getNextNode());
+            }
         } else {
             if (currentPosition.isNodePosition()) {
                 currentPosition.putChild(symbolPosition);
+                while(currentPosition.getNode().hasSuffixLink()) {
+                    currentPosition.toSuffixLink();
+                    if (currentPosition.canMove(currentChar)) {
+                        currentPosition.move(currentChar);
+                        break;
+                    } else {
+                        currentPosition.putChild(symbolPosition);
+                    }
+                }
             } else {
-                splitNodeAndCreateSuffixLinks(source, symbolPosition, currentPosition, root);
+                Node newNode = currentPosition.split();
+                newNode.putChild(currentChar, symbolPosition, source.length() - 1);
+                createSuffixLinks(source, symbolPosition, currentPosition, newNode, root);
             }
         }
     }
 
-    private Node splitNodeAndCreateSuffixLinks(String str, int currentIndex, Position currentPosition, Node root) {
-        Node newNode;
-        if (currentPosition.canSplit()) {
-            newNode = currentPosition.split();
-            newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
-            moveToSuffixLink(str, currentIndex, currentPosition, root, newNode);
-        } else {
-            newNode = currentPosition.getNextNode();
-            if (newNode.hasChild(str.charAt(currentIndex))) {
-                currentPosition.move(str.charAt(currentIndex));
-                return newNode;
-            } else {
+    private void createSuffixLinks(String str, int currentIndex, Position currentPosition, Node lastNode, Node root) {
+        moveToSuffixLink(currentPosition, root, lastNode);
+        while (!currentPosition.isNodePosition() || currentPosition.getNode() != root) {
+            if(currentPosition.canSplit()) {
+                Node newNode = currentPosition.split();
+                lastNode.setSuffixLink(newNode);
+                //currentPosition.setNode(newNode);
+                lastNode = newNode;
                 newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
+                moveToSuffixLink(currentPosition, root, newNode);
+
+            } else {
+                if (currentPosition.hasNextNode()) {
+                    lastNode.setSuffixLink(currentPosition.getNextNode());
+                }else {
+                    lastNode.setSuffixLink(currentPosition.getNode());
+                }
+                if(currentPosition.canMove(str.charAt(currentIndex))) {
+                    currentPosition.move(str.charAt(currentIndex));
+                    return;
+                }
+                currentPosition.putChild(currentIndex);
+                //currentPosition.toSuffixLink();
+                if(currentPosition.hasNextNode()) {
+                    lastNode = currentPosition.getNextNode();
+                } else {
+                    lastNode = currentPosition.getNode();
+                }
+
+                moveToSuffixLink(currentPosition, root, currentPosition.getNode());
             }
         }
-
-        return newNode;
-    }
-
-    private void moveToSuffixLink(String str, int currentIndex, Position currentPosition, Node root, Node newNode) {
-        if (newNode.hasSuffixLink()) {
-            currentPosition.setNode(newNode);
-            currentPosition.toSuffixLink();
-            moveToSuffixLink(str, currentIndex, currentPosition, root, newNode.getSuffixLink());
-            return;
-        }
-        if (newNode == root) {
-            currentPosition.setNode(root);
-            if (root.hasChild(str.charAt(currentIndex))) {
+        if (currentPosition.getNode() == root && currentPosition.isNodePosition()) {
+            lastNode.setSuffixLink(root);
+            if(currentPosition.canMove(str.charAt(currentIndex))) {
                 currentPosition.move(str.charAt(currentIndex));
             } else {
                 currentPosition.putChild(currentIndex);
             }
-            return;
         }
+        if(currentPosition.hasNextNode()) {
+            currentPosition.setNode(currentPosition.getNextNode());
+        }
+    }
+
+    private void moveToSuffixLink(Position currentPosition, Node root, Node newNode) {
         if (currentPosition.getNode() == root) {
             if (currentPosition.getEdge().getLength() == 1) {//TODO
                 currentPosition.setNode(root);
-                newNode.setSuffixLink(root);
-                moveToSuffixLink(str, currentIndex, currentPosition, root, root);
-//                if (!newNode.hasChild(str.charAt(currentIndex))) {
-//                    currentPosition.putChild(currentIndex);
-//                }
             } else {
                 int left = currentPosition.getEdge().getLeft() + 1;
                 int right = currentPosition.getEdge().getRight();
                 currentPosition.setNode(root);
-                Node suffixLink = down(str, currentIndex, currentPosition, left, right, root);
-                newNode.setSuffixLink(suffixLink);
-                //moveToSuffixLink(str, currentIndex, currentPosition, root, suffixLink);
+                currentPosition.moveTo(left, right);
             }
         } else {
             int left = currentPosition.getEdge().getLeft();
             int right = currentPosition.getEdge().getRight();
             currentPosition.toSuffixLink();
-            Node suffixLink = down(str, currentIndex, currentPosition, left, right, root);
-            newNode.setSuffixLink(suffixLink);
+            currentPosition.moveTo(left, right);
         }
-    }
-
-    private Node down(String str, int currentIndex, Position currentPosition, int left, int right, Node root) {
-        currentPosition.moveTo(left, right);
-        if (currentPosition.isNodePosition()) {
-            Node result = currentPosition.getNode();
-            if (!result.hasChild(str.charAt(currentIndex))) {
-                currentPosition.putChild(currentIndex);
-            }
-            return result;
-        } else {
-            return splitNodeAndCreateSuffixLinks(str, currentIndex, currentPosition, root);
-        }
+//        if(currentPosition.hasNextNode()) {
+//            currentPosition.setNode(currentPosition.getNextNode());
+//        }
     }
 
     public static void main(String[] args) {
