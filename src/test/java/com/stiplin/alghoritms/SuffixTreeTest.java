@@ -6,7 +6,7 @@ import org.junit.Test;
 public class SuffixTreeTest {
 
     @Test
-    public void test() {
+    public void testaaaaa() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
         Node root = factory.buildSuffixTree("aaaaa");
 
@@ -83,11 +83,11 @@ public class SuffixTreeTest {
         edge = node4.getChild('a');
         Assert.assertEquals(4, edge.getLeft());
         Assert.assertEquals(5, edge.getRight());
-       // root = edge.getDest();
+        // root = edge.getDest();
     }
 
     @Test
-    public void test1() {
+    public void testabrashvabracadabra() {
         SuffixTreeFactory factory = new SuffixTreeFactory();
         Node root = factory.buildSuffixTree("abrashvabracadabra");
 
@@ -233,6 +233,485 @@ public class SuffixTreeTest {
         Assert.assertEquals(18, edge.getLeft());
         Assert.assertEquals(18, edge.getRight());
         Assert.assertTrue(edge.getDest().isTerminal());
+    }
+
+    @Test
+    public void testababbabbba$() {
+        SuffixTreeFactory suffixTreeFactory = new SuffixTreeFactory();
+        String sting = "ababbabbba$";
+        Node root = new Node();
+
+        Position currentPosition = new Position(sting, root, null, 0);
+
+        //Add 'a'
+        suffixTreeFactory.addSymbol(sting, 0, root, currentPosition);
+        Assert.assertEquals(1, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertFalse(root.hasSuffixLink());
+        Edge edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        Assert.assertEquals(currentPosition.getNode(), root);
+        Assert.assertNull(currentPosition.getLeaveCharacter());
+        Assert.assertEquals(0, currentPosition.getEdgePosition());
+
+        //Add 'ab'
+        suffixTreeFactory.addSymbol(sting, 1, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertEquals(currentPosition.getNode(), root);
+        Assert.assertNull(currentPosition.getLeaveCharacter());
+        Assert.assertEquals(0, currentPosition.getEdgePosition());
+
+        //Add symbol 'aba'
+        suffixTreeFactory.addSymbol(sting, 2, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertEquals(currentPosition.getNode(), root);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(0, currentPosition.getEdgePosition());
+
+        //Add symbol 'abab'
+        suffixTreeFactory.addSymbol(sting, 3, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertEquals(currentPosition.getNode(), root);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(1, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababb'
+        suffixTreeFactory.addSymbol(sting, 4, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        Node nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        Node nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+
+        Assert.assertEquals(currentPosition.getNode(), nodeb);
+        Assert.assertNull(currentPosition.getLeaveCharacter());
+        Assert.assertEquals(0, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababba'
+        suffixTreeFactory.addSymbol(sting, 5, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+
+        Assert.assertEquals(currentPosition.getNode(), nodeb);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(2, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababbab'
+        suffixTreeFactory.addSymbol(sting, 6, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+
+        Assert.assertEquals(currentPosition.getNode(), nodeb);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(3, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababbabb'
+        suffixTreeFactory.addSymbol(sting, 7, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeb.getChild('b');
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+
+        Assert.assertEquals(currentPosition.getNode(), nodeb);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(4, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababbabbb'
+        suffixTreeFactory.addSymbol(sting, 8, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        Node nodeabb = edge.getDest();
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+        edge = nodeb.getChild('a');
+        Node nodebabb = edge.getDest();
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+        edge = nodeb.getChild('b');
+        Node nodebb = edge.getDest();
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+
+        Assert.assertFalse(nodeabb.isTerminal());
+        Assert.assertTrue(nodeabb.hasSuffixLink());
+        Assert.assertEquals(2, nodeabb.getChildren().size());
+        Assert.assertEquals(nodeabb.getSuffixLink(), nodebb);
+        Assert.assertTrue(nodeabb.hasChild('a'));
+        Assert.assertTrue(nodeabb.hasChild('b'));
+        edge = nodeabb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeabb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertFalse(nodebabb.isTerminal());
+        Assert.assertTrue(nodebabb.hasSuffixLink());
+        Assert.assertEquals(2, nodebabb.getChildren().size());
+        Assert.assertEquals(nodebabb.getSuffixLink(), nodeabb);
+        Assert.assertTrue(nodebabb.hasChild('a'));
+        Assert.assertTrue(nodebabb.hasChild('b'));
+        edge = nodebabb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodebabb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertFalse(nodebb.isTerminal());
+        Assert.assertTrue(nodebb.hasSuffixLink());
+        Assert.assertEquals(2, nodebb.getChildren().size());
+        Assert.assertEquals(nodebb.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodebb.hasChild('a'));
+        Assert.assertTrue(nodebb.hasChild('b'));
+        edge = nodebb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodebb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertEquals(currentPosition.getNode(), nodeb);
+        Assert.assertEquals(Character.valueOf('b'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(4, currentPosition.getEdgePosition());
+
+        //Add symbol 'ababbabbba'
+        suffixTreeFactory.addSymbol(sting, 9, root, currentPosition);
+        Assert.assertEquals(2, root.getChildren().size());
+        Assert.assertTrue(root.hasChild('a'));
+        Assert.assertTrue(root.hasChild('b'));
+        Assert.assertFalse(root.hasSuffixLink());
+        edge = root.getChild('a');
+        Assert.assertEquals(0, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeab = edge.getDest();
+        edge = root.getChild('b');
+        Assert.assertEquals(1, edge.getLeft());
+        Assert.assertEquals(1, edge.getRight());
+        nodeb = edge.getDest();
+
+        Assert.assertFalse(nodeab.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        Assert.assertFalse(nodeb.isTerminal());
+        Assert.assertTrue(nodeab.hasSuffixLink());
+        Assert.assertEquals(2, nodeab.getChildren().size());
+        Assert.assertEquals(nodeab.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodeab.hasChild('a'));
+        Assert.assertTrue(nodeab.hasChild('b'));
+
+        edge = nodeab.getChild('a');
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeab.getChild('b');
+        nodeabb = edge.getDest();
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+        edge = nodeb.getChild('a');
+        nodebabb = edge.getDest();
+        Assert.assertEquals(2, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+        edge = nodeb.getChild('b');
+        nodebb = edge.getDest();
+        Assert.assertEquals(4, edge.getLeft());
+        Assert.assertEquals(4, edge.getRight());
+
+        Assert.assertFalse(nodeabb.isTerminal());
+        Assert.assertTrue(nodeabb.hasSuffixLink());
+        Assert.assertEquals(2, nodeabb.getChildren().size());
+        Assert.assertEquals(nodeabb.getSuffixLink(), nodebb);
+        Assert.assertTrue(nodeabb.hasChild('a'));
+        Assert.assertTrue(nodeabb.hasChild('b'));
+        edge = nodeabb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodeabb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertFalse(nodebabb.isTerminal());
+        Assert.assertTrue(nodebabb.hasSuffixLink());
+        Assert.assertEquals(2, nodebabb.getChildren().size());
+        Assert.assertEquals(nodebabb.getSuffixLink(), nodeabb);
+        Assert.assertTrue(nodebabb.hasChild('a'));
+        Assert.assertTrue(nodebabb.hasChild('b'));
+        edge = nodebabb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodebabb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertFalse(nodebb.isTerminal());
+        Assert.assertTrue(nodebb.hasSuffixLink());
+        Assert.assertEquals(2, nodebb.getChildren().size());
+        Assert.assertEquals(nodebb.getSuffixLink(), nodeb);
+        Assert.assertTrue(nodebb.hasChild('a'));
+        Assert.assertTrue(nodebb.hasChild('b'));
+        edge = nodebb.getChild('a');
+        Assert.assertEquals(5, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+        edge = nodebb.getChild('b');
+        Assert.assertEquals(8, edge.getLeft());
+        Assert.assertEquals(10, edge.getRight());
+        Assert.assertTrue(edge.getDest().isTerminal());
+
+        Assert.assertEquals(currentPosition.getNode(), nodebb);
+        Assert.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
+        Assert.assertEquals(5, currentPosition.getEdgePosition());
+
+        suffixTreeFactory.addSymbol(sting, 10, root, currentPosition);
+         System.out.println(suffixTreeFactory.print(root, 0));
     }
 
 }

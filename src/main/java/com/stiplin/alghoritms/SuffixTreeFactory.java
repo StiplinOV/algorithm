@@ -21,7 +21,7 @@ class Node {
 
     void putChild(char character, int left, int right) {
         if (this.hasChild(character)) {
-            System.out.println(1);
+            throw new IllegalStateException();
         }
         this.putChild(character, new Edge(left, right));
     }
@@ -90,6 +90,9 @@ class Edge {
     }
 
     Edge(int left, int right, Node dest) {
+        if (left > right) {
+            throw new IllegalArgumentException();
+        }
         this.left = left;
         this.right = right;
         if (dest == null) {
@@ -112,6 +115,9 @@ class Edge {
     }
 
     public void setRight(int right) {
+        if (this.left > right) {
+            throw new IllegalArgumentException();
+        }
         this.right = right;
     }
 
@@ -147,10 +153,6 @@ class Position {
 
     private Node node;
 
-    private Node prevNode;
-
-    private Edge prevEdge;
-
     private Character leaveCharacter;
 
     private int edgePosition;
@@ -166,20 +168,17 @@ class Position {
         return node;
     }
 
-    public boolean hasPrevNode() {
-        return prevNode != null;
-    }
-
-    public Node getPrevNode() {
-        return prevNode;
-    }
-
-    public Edge getPrevEdge() {
-        return prevEdge;
+    public Character getLeaveCharacter() {
+        return leaveCharacter;
     }
 
     Edge getEdge() {
-        return this.node.getChild(leaveCharacter);
+        try {
+            return this.node.getChild(leaveCharacter);
+        } catch (NullPointerException ex) {
+            System.out.println(1);
+            throw ex;
+        }
     }
 
     int getEdgePosition() {
@@ -201,7 +200,7 @@ class Position {
             try {
                 return source.charAt(edgePosition + 1) == character;
             } catch (Throwable ex) {
-                System.out.println(1);
+                //System.out.println(1);
                 throw ex;
             }
         }
@@ -214,18 +213,13 @@ class Position {
                 edgePosition = node.getChild(character).getLeft();
             } else {
                 Edge edge = node.getChild(leaveCharacter);
-                if (edge.getRight() >= edgePosition) {
+                if (edge.getRight() > edgePosition) {
                     edgePosition++;
+                } else {
+                    setNode(edge.getDest());
+                    leaveCharacter = character;
+                    edgePosition = edge.getDest().getChild(leaveCharacter).getLeft();
                 }
-            }
-
-            Edge edge = node.getChild(leaveCharacter);
-            if (edge.getRight() == edgePosition) {
-                prevNode = node;
-                prevEdge = getEdge();
-                node = edge.getDest();
-                leaveCharacter = null;
-                edgePosition = 0;
             }
         } catch (NullPointerException ex) {
             throw ex;
@@ -233,21 +227,42 @@ class Position {
     }
 
     void back() {
-        if(this.isNodePosition()) {
+        if (this.isNodePosition()) {
             throw new IllegalStateException("");
         }
         this.edgePosition--;
     }
 
     public void setNode(Node node) {
+        if (node == null) {
+            System.out.println(1);
+        }
         this.node = node;
-        this.prevNode = null;
         this.leaveCharacter = null;
         this.edgePosition = 0;
     }
 
+    public boolean canSplit() {
+        if (leaveCharacter == null) {
+            return false;
+        }
+        Edge edge = this.getNode().getChild(leaveCharacter);
+        return edge.getRight() > edgePosition;
+    }
+
     public Node split() {
         return this.getEdge().split(source.charAt(this.getEdgePosition() + 1), this.getEdgePosition());
+    }
+
+    Node getNextNode() {
+        if (leaveCharacter == null) {
+            throw new IllegalStateException();
+        }
+        Edge edge = this.getNode().getChild(leaveCharacter);
+        if (edge.getRight() == edgePosition) {
+            return edge.getDest();
+        }
+        throw new IllegalStateException();
     }
 
     public void toNode() {
@@ -255,12 +270,17 @@ class Position {
         this.edgePosition = 0;
     }
 
+    public void toSuffixLink() {
+        this.setNode(this.getNode().getSuffixLink());
+    }
+
     Node putChild(int index) {
         Node result = this.getNode();
 
-        if (!this.isNodePosition()) {
-            result = this.split();
+        if (!isNodePosition()) {
+            throw new IllegalStateException();
         }
+
         result.putChild(source.charAt(index), index, source.length() - 1);
 
         return result;
@@ -269,9 +289,6 @@ class Position {
     void moveTo(int indexFrom, int indexTo) {
         for (int i = indexFrom; i <= indexTo; i++) {
             char currentCharacter = source.charAt(i);
-            if (!this.canMove(currentCharacter)) {
-                this.putChild(i);
-            }
             this.move(currentCharacter);
         }
     }
@@ -284,145 +301,113 @@ public class SuffixTreeFactory {
         return buildSuffixTree(str + '$', '$');
     }
 
-    /*
-     Считываем символы
-
-Если находимся в вершине
-	не можем идти - добавляем все символы
-	можем идти - идем к символу
-Если находимся в ребре
-	Если можем идти - идем к символу
-	Если не можем идти
-		сплитим
-		к созданной ноде добавляем все символы
-		обновляем суффиксные ссылки для созданой вершины
-
-
-Обновление суффиксных сылок:
-	Если текущая вершина корень
-		Если расстояние между созданой и текущей вершиной 1, то созданную вершину линкуем к корню и продолжаем считывать символы
-		иначе от корня ищем точку - префикс от корня до созданной ноде
-		При необходимости её сплитим
-		созданную вершину линкуем к точке и вызываем алгоритм обновления суффиксных ссылок для суффикса
-	Если текущая вершина не корень
-		берем от нее суффиксную ссылку
-		спускаемся до такой же точки как подстрока от текущей вершины до созданной ноды. При необходимости создаем эту точку.
-		созданную вершину линкуем к точке
-		текущая вершина теперь вершина которая "над" точкой
-		Если она содержит суффиксную ссылку - выполняем обновление суффиксной ссылки
-		Если нет, продолжаем считывать символы. Это теперь текущая позиция
-    * */
-
-    public Node buildSuffixTree(String str, char lastSymbol) {
+    public Node buildSuffixTree(String str, Object o) {
         Node root = new Node();
         Position currentPosition = new Position(str, root, null, 0);
 
         for (int i = 0; i < str.length(); i++) {
-            char currentChar = str.charAt(i);
-            System.out.println(currentChar);
-            System.out.println(print(root, 0));
-            if (currentPosition.canMove(currentChar)) {
-                currentPosition.move(currentChar);
-            } else {
-                if (currentPosition.isNodePosition()) {
-                    Node suffixTreeNode = currentPosition.putChild(i);
-                    if (currentPosition.hasPrevNode()) {
-                        Edge edge = currentPosition.getPrevEdge();
-                        currentPosition.setNode(currentPosition.getPrevNode());
-                        currentPosition = createSuffixLinks(
-                                str,
-                                i,
-                                currentPosition,
-                                suffixTreeNode,
-                                root,
-                                edge.getLeft(),
-                                edge.getRight()
-                        );
-                    }
-                    //TODO а если мы не в корне?
-                } else {
-                    Node suffixTreeNode = currentPosition.putChild(i);
-                    Edge edge = currentPosition.getEdge();
-                    currentPosition = createSuffixLinks(
-                            str,
-                            i,
-                            currentPosition,
-                            suffixTreeNode,
-                            root,
-                            edge.getLeft(),
-                            edge.getRight()
-                    );
-                }
-            }
+            addSymbol(str, i, root, currentPosition);
         }
 
         System.out.println(print(root, 0));
         return root;
     }
 
-    Position createSuffixLinks(
-            String str,
-            int currentIndex,
-            Position currentPosition,
-            Node suffixTreeNode,
-            Node root,
-            int left,
-            int right
-    ) {
-        if (currentPosition.getNode() == root) {
-            if (left > right) {
-                suffixTreeNode.setSuffixLink(root);
-                currentPosition.setNode(root);
-                currentPosition.putChild(currentIndex);
-
-                return currentPosition;
-            }
-            currentPosition.setNode(root);
-            currentPosition.moveTo(left, right);
-            suffixTreeNode.setSuffixLink(currentPosition.putChild(currentIndex));
-            currentPosition.setNode(root);
-            return createSuffixLinks(str, currentIndex, currentPosition, suffixTreeNode.getSuffixLink(), root, left+1, right);
-            //	    Если текущая вершина корень
-            //		Если расстояние между созданой и текущей вершиной 1, то созданную вершину линкуем к корню и продолжаем считывать символы
-            //		иначе от корня ищем точку - префикс от корня до созданной ноде
-            //		При необходимости её сплитим
-            //		созданную вершину линкуем к точке и вызываем алгоритм обновления суффиксных ссылок для суффикса
+    public void addSymbol(String source, int symbolPosition, Node root, Position currentPosition) {
+        char currentChar = source.charAt(symbolPosition);
+        if (currentPosition.canMove(currentChar)) {
+            currentPosition.move(currentChar);
         } else {
-            Node currentSuffix = currentPosition.getNode().getSuffixLink();
-            Position suffixPosition = new Position(str, currentSuffix, null, 0);
-            suffixPosition.moveTo(left, right);
-            suffixTreeNode.setSuffixLink(suffixPosition.putChild(currentIndex));
-
-            if(suffixPosition.isNodePosition()) {
-                suffixPosition = new Position(str, suffixPosition.getPrevNode(), null, 0);
+            if (currentPosition.isNodePosition()) {
+                currentPosition.putChild(symbolPosition);
+            } else {
+                splitNodeAndCreateSuffixLinks(source, symbolPosition, currentPosition, root);
             }
+        }
+    }
 
-            if (currentSuffix.hasSuffixLink() || currentSuffix == root) {
-                return createSuffixLinks(str, currentIndex, suffixPosition, suffixTreeNode.getSuffixLink(), root, left, right);
+    private Node splitNodeAndCreateSuffixLinks(String str, int currentIndex, Position currentPosition, Node root) {
+        Node newNode;
+        if (currentPosition.canSplit()) {
+            newNode = currentPosition.split();
+            newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
+            moveToSuffixLink(str, currentIndex, currentPosition, root, newNode);
+        } else {
+            newNode = currentPosition.getNextNode();
+            if (newNode.hasChild(str.charAt(currentIndex))) {
+                currentPosition.move(str.charAt(currentIndex));
+                return newNode;
+            } else {
+                newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
             }
+        }
 
-            return new Position(str, currentSuffix, null, 0);
-            //Обновление суффиксных сылок:
+        return newNode;
+    }
 
-            //	Если текущая вершина не корень
-            //		берем от нее суффиксную ссылку
-            //		спускаемся до такой же точки как подстрока от текущей вершины до созданной ноды. При необходимости создаем эту точку.
-            //		созданную вершину линкуем к точке
-            //		текущая вершина теперь вершина которая "над" точкой
-            //		Если она содержит суффиксную ссылку - выполняем обновление суффиксной ссылки
-            //		Если нет, продолжаем считывать символы. Это теперь текущая позиция
+    private void moveToSuffixLink(String str, int currentIndex, Position currentPosition, Node root, Node newNode) {
+        if (newNode.hasSuffixLink()) {
+            currentPosition.setNode(newNode);
+            currentPosition.toSuffixLink();
+            moveToSuffixLink(str, currentIndex, currentPosition, root, newNode.getSuffixLink());
+            return;
+        }
+        if (newNode == root) {
+            currentPosition.setNode(root);
+            if (root.hasChild(str.charAt(currentIndex))) {
+                currentPosition.move(str.charAt(currentIndex));
+            } else {
+                currentPosition.putChild(currentIndex);
+            }
+            return;
+        }
+        if (currentPosition.getNode() == root) {
+            if (currentPosition.getEdge().getLength() == 1) {//TODO
+                currentPosition.setNode(root);
+                newNode.setSuffixLink(root);
+                moveToSuffixLink(str, currentIndex, currentPosition, root, root);
+//                if (!newNode.hasChild(str.charAt(currentIndex))) {
+//                    currentPosition.putChild(currentIndex);
+//                }
+            } else {
+                int left = currentPosition.getEdge().getLeft() + 1;
+                int right = currentPosition.getEdge().getRight();
+                currentPosition.setNode(root);
+                Node suffixLink = down(str, currentIndex, currentPosition, left, right, root);
+                newNode.setSuffixLink(suffixLink);
+                //moveToSuffixLink(str, currentIndex, currentPosition, root, suffixLink);
+            }
+        } else {
+            int left = currentPosition.getEdge().getLeft();
+            int right = currentPosition.getEdge().getRight();
+            currentPosition.toSuffixLink();
+            Node suffixLink = down(str, currentIndex, currentPosition, left, right, root);
+            newNode.setSuffixLink(suffixLink);
+        }
+    }
+
+    private Node down(String str, int currentIndex, Position currentPosition, int left, int right, Node root) {
+        currentPosition.moveTo(left, right);
+        if (currentPosition.isNodePosition()) {
+            Node result = currentPosition.getNode();
+            if (!result.hasChild(str.charAt(currentIndex))) {
+                currentPosition.putChild(currentIndex);
+            }
+            return result;
+        } else {
+            return splitNodeAndCreateSuffixLinks(str, currentIndex, currentPosition, root);
         }
     }
 
     public static void main(String[] args) {
-        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababb"), 0));
+        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababbabbba"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbab"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbabbabbbbb"), 0));
-        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
+//        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
     }
 
 
-    private static String print(Node node, int depth) {
+    static String print(Node node, int depth) {
         StringBuilder result = new StringBuilder();
         if (node.isTerminal()) {
             return "TERMINAL\n";
