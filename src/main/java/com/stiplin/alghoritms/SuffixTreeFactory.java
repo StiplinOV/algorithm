@@ -327,12 +327,18 @@ public class SuffixTreeFactory {
 
     public void addSymbol(String source, int symbolPosition, Node root, Position currentPosition) {
         char currentChar = source.charAt(symbolPosition);
+        if(symbolPosition == 34) {
+            System.out.println(1);
+        }
         if (currentPosition.canMove(currentChar)) {
             currentPosition.move(currentChar);
             if(currentPosition.hasNextNode()) {
                 currentPosition.setNode(currentPosition.getNextNode());
             }
         } else {
+            if(currentPosition.hasNextNode()) {
+                currentPosition.setNode(currentPosition.getNextNode());
+            }
             if (currentPosition.isNodePosition()) {
                 currentPosition.putChild(symbolPosition);
                 while(currentPosition.getNode().hasSuffixLink()) {
@@ -419,10 +425,10 @@ public class SuffixTreeFactory {
     }
 
     public static void main(String[] args) {
-        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababbabbba"), 0));
+//        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababbabbba"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbab"), 0));
 //        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbabbabbbbb"), 0));
-//        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
+        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
     }
 
 
