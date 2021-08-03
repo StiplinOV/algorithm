@@ -288,6 +288,7 @@ class Position {
 class SuffixTreeFactory {
 
     public Node buildSuffixTree(String str) {
+        //TODO string concatenation is contreffective. need refactoring
         return buildSuffixTree(str + '$', '$');
     }
 
@@ -340,7 +341,6 @@ class SuffixTreeFactory {
                 lastNode.setSuffixLink(newNode);
                 lastNode = newNode;
                 newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
-                moveToSuffixLink(currentPosition, root);
             } else {
                 if (currentPosition.hasNextNode()) {
                     lastNode.setSuffixLink(currentPosition.getNextNode());
@@ -358,8 +358,8 @@ class SuffixTreeFactory {
                     lastNode = currentPosition.getNode();
                 }
 
-                moveToSuffixLink(currentPosition, root);
             }
+            moveToSuffixLink(currentPosition, root);
         }
         if (currentPosition.getNode() == root && currentPosition.isNodePosition()) {
             lastNode.setSuffixLink(root);
