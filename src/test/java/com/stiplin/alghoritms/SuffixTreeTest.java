@@ -711,7 +711,6 @@ public class SuffixTreeTest {
         Assert.assertEquals(5, currentPosition.getEdgePosition());
 
         suffixTreeFactory.addSymbol(sting, 10, root, currentPosition);
-         System.out.println(suffixTreeFactory.print(root, 0));
     }
 
 }

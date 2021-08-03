@@ -1,9 +1,6 @@
 package com.stiplin.alghoritms;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 class Node {
 
@@ -170,7 +167,7 @@ class Position {
     }
 
     Edge getEdge() {
-            return this.node.getChild(leaveCharacter);
+        return this.node.getChild(leaveCharacter);
     }
 
     int getEdgePosition() {
@@ -183,29 +180,13 @@ class Position {
 
     boolean canMove(char character) {
         if (leaveCharacter == null) {
-                return node.hasChild(character);
+            return node.hasChild(character);
         } else {
-                if (hasNextNode()) {
-                    return new Position(source, this.getNextNode(), null, 0).canMove(character);
-                }
-                return source.charAt(edgePosition + 1) == character;
-        }
-    }
-
-    void move(char character) {
-            if (leaveCharacter == null) {
-                leaveCharacter = character;
-                edgePosition = node.getChild(character).getLeft();
-            } else {
-                Edge edge = node.getChild(leaveCharacter);
-                if (edge.getRight() > edgePosition) {
-                    edgePosition++;
-                } else {
-                    setNode(edge.getDest());
-                    leaveCharacter = character;
-                    edgePosition = edge.getDest().getChild(leaveCharacter).getLeft();
-                }
+            if (hasNextNode()) {
+                return new Position(source, this.getNextNode(), null, 0).canMove(character);
             }
+            return source.charAt(edgePosition + 1) == character;
+        }
     }
 
     public void setNode(Node node) {
@@ -251,7 +232,7 @@ class Position {
 
     void putChild(int index) {
         Node result = this.getNode();
-        if(hasNextNode()) {
+        if (hasNextNode()) {
             result = getNextNode();
         } else if (!isNodePosition()) {
             throw new IllegalStateException();
@@ -261,22 +242,44 @@ class Position {
     }
 
     void moveTo(int indexFrom, int indexTo) {
-        if (leaveCharacter != null) {
-            Edge edge = node.getChild(leaveCharacter);
-            if (indexFrom == edgePosition) {
-                if (indexTo > edge.getRight()) {
-                    edgePosition = edge.getRight();
-                    moveTo(edge.getRight() + 1, indexTo);
-                    return;
+        int remainingShifts = indexTo - indexFrom + 1;
+        int currentCharPosition = indexFrom;
+        while (remainingShifts != 0) {
+            if (leaveCharacter == null) {
+                this.move(source.charAt(currentCharPosition));
+                remainingShifts -= 1;
+            } else {
+                Edge edge = node.getChild(leaveCharacter);
+                if (edge.getRight() == edgePosition) {
+                    this.move(source.charAt(currentCharPosition));
+                    remainingShifts -= 1;
                 } else {
-                    edgePosition = indexTo;
-                    moveTo(indexTo + 1, edge.getRight());
+                    if (edge.getRight() - edgePosition > remainingShifts) {
+                        edgePosition += remainingShifts;
+                        return;
+                    } else {
+                        remainingShifts -= edge.getRight() - edgePosition;
+                        edgePosition = edge.getRight();
+                    }
                 }
             }
+            currentCharPosition = indexTo - remainingShifts + 1;
         }
-        for (int i = indexFrom; i <= indexTo; i++) {
-            char currentCharacter = source.charAt(i);
-            this.move(currentCharacter);
+    }
+
+    void move(char character) {
+        if (leaveCharacter == null) {
+            leaveCharacter = character;
+            edgePosition = node.getChild(character).getLeft();
+        } else {
+            Edge edge = node.getChild(leaveCharacter);
+            if (edge.getRight() > edgePosition) {
+                edgePosition++;
+            } else {
+                setNode(edge.getDest());
+                leaveCharacter = character;
+                edgePosition = edge.getDest().getChild(leaveCharacter).getLeft();
+            }
         }
     }
 
@@ -303,16 +306,16 @@ class SuffixTreeFactory {
         char currentChar = source.charAt(symbolPosition);
         if (currentPosition.canMove(currentChar)) {
             currentPosition.move(currentChar);
-            if(currentPosition.hasNextNode()) {
+            if (currentPosition.hasNextNode()) {
                 currentPosition.setNode(currentPosition.getNextNode());
             }
         } else {
-            if(currentPosition.hasNextNode()) {
+            if (currentPosition.hasNextNode()) {
                 currentPosition.setNode(currentPosition.getNextNode());
             }
             if (currentPosition.isNodePosition()) {
                 currentPosition.putChild(symbolPosition);
-                while(currentPosition.getNode().hasSuffixLink()) {
+                while (currentPosition.getNode().hasSuffixLink()) {
                     currentPosition.toSuffixLink();
                     if (currentPosition.canMove(currentChar)) {
                         currentPosition.move(currentChar);
@@ -332,27 +335,24 @@ class SuffixTreeFactory {
     private void createSuffixLinks(String str, int currentIndex, Position currentPosition, Node lastNode, Node root) {
         moveToSuffixLink(currentPosition, root);
         while (!currentPosition.isNodePosition() || currentPosition.getNode() != root) {
-            if(currentPosition.canSplit()) {
+            if (currentPosition.canSplit()) {
                 Node newNode = currentPosition.split();
                 lastNode.setSuffixLink(newNode);
-                //currentPosition.setNode(newNode);
                 lastNode = newNode;
                 newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
                 moveToSuffixLink(currentPosition, root);
-
             } else {
                 if (currentPosition.hasNextNode()) {
                     lastNode.setSuffixLink(currentPosition.getNextNode());
-                }else {
+                } else {
                     lastNode.setSuffixLink(currentPosition.getNode());
                 }
-                if(currentPosition.canMove(str.charAt(currentIndex))) {
+                if (currentPosition.canMove(str.charAt(currentIndex))) {
                     currentPosition.move(str.charAt(currentIndex));
                     return;
                 }
                 currentPosition.putChild(currentIndex);
-                //currentPosition.toSuffixLink();
-                if(currentPosition.hasNextNode()) {
+                if (currentPosition.hasNextNode()) {
                     lastNode = currentPosition.getNextNode();
                 } else {
                     lastNode = currentPosition.getNode();
@@ -363,13 +363,13 @@ class SuffixTreeFactory {
         }
         if (currentPosition.getNode() == root && currentPosition.isNodePosition()) {
             lastNode.setSuffixLink(root);
-            if(currentPosition.canMove(str.charAt(currentIndex))) {
+            if (currentPosition.canMove(str.charAt(currentIndex))) {
                 currentPosition.move(str.charAt(currentIndex));
             } else {
                 currentPosition.putChild(currentIndex);
             }
         }
-        if(currentPosition.hasNextNode()) {
+        if (currentPosition.hasNextNode()) {
             currentPosition.setNode(currentPosition.getNextNode());
         }
     }
@@ -390,73 +390,6 @@ class SuffixTreeFactory {
             currentPosition.toSuffixLink();
             currentPosition.moveTo(left, right);
         }
-    }
-
-    public static void main(String[] args) {
-//        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("ababbabbba"), 0));
-//        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbab"), 0));
-//        System.out.println(print(new SuffixTreeFactory().buildSuffixTree("aacbbabbabbbbb"), 0));
-        System.out.println(maxValue("aacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccbaacbbabbabbbbbaaaaaaabbbbcacacbcabaccaabbbcaaabbccccbbbcbccccbbcaabaaabcbaacbcbaccaaaccbccbcaacbaccb"));
-    }
-
-
-    static String print(Node node, int depth) {
-        StringBuilder result = new StringBuilder();
-        if (node.isTerminal()) {
-            return "TERMINAL\n";
-        }
-        result.append("{\n");
-        for (int i = 0; i <= depth; i++) {
-            result.append("\t");
-        }
-        result.append(node.hashCode()).append("\n");
-        for (char key : node.getChildren().keySet()) {
-            Edge edge = node.getChild(key);
-            for (int i = 0; i <= depth; i++) {
-                result.append("\t");
-            }
-            result.append(key).append(" => [").append(edge.getLeft()).append(";").append(edge.getRight()).append("], dest=").append(print(edge.getDest(), depth + 1));
-        }
-        for (int i = 0; i <= depth; i++) {
-            result.append("\t");
-        }
-        result.append("suffixLink: ").append(node.getSuffixLink() == null ? "null" : node.getSuffixLink().hashCode()).append("\n");
-        for (int i = 0; i < depth; i++) {
-            result.append("\t");
-        }
-        result.append("}\n");
-
-        return result.toString();
-    }
-
-    private static int maxValue(String t) {
-        Node root = new SuffixTreeFactory().buildSuffixTree(t);
-
-        return maxValue(root, 0, 0);
-    }
-
-    private static int maxValue(Node node, int maxValueParam, int initialLength) {
-        int maxValue = maxValueParam;
-
-        for (Edge edge : node.edges()) {
-            int edgeMaxValue = maxValue(edge, initialLength);
-            if (maxValue < edgeMaxValue) {
-                maxValue = edgeMaxValue;
-            }
-        }
-
-        return maxValue;
-    }
-
-    private static int maxValue(Edge edge, int initialLength) {
-        int edgeLength = edge.getLength();
-        if (edge.getDest().isTerminal()) {
-            edgeLength -= 1;
-        }
-        int rootToDestLength = initialLength + edgeLength;
-        int initialMaxValue = (rootToDestLength) * edge.getNumberOfTerminals();
-
-        return maxValue(edge.getDest(), initialMaxValue, rootToDestLength);
     }
 
 }
