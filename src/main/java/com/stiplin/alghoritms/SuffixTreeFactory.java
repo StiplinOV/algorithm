@@ -17,9 +17,6 @@ class Node {
     }
 
     void putChild(char character, int left, int right) {
-        if (this.hasChild(character)) {
-            throw new IllegalStateException();
-        }
         this.putChild(character, new Edge(left, right));
     }
 
@@ -51,24 +48,6 @@ class Node {
         return children.keySet();
     }
 
-    public Collection<Edge> edges() {
-        return children.values();
-    }
-
-    public int getNumberOfTerminals() {
-        Collection<Edge> edges = children.values();
-        int result = 0;
-
-        if (edges.isEmpty()) {
-            return 1;
-        }
-        for (Edge edge : edges) {
-            result += edge.getNumberOfTerminals();
-        }
-
-        return result;
-    }
-
 }
 
 class Edge {
@@ -84,9 +63,6 @@ class Edge {
     }
 
     Edge(int left, int right, Node dest) {
-        if (left > right) {
-            throw new IllegalArgumentException();
-        }
         this.left = left;
         this.right = right;
         if (dest == null) {
@@ -109,9 +85,6 @@ class Edge {
     }
 
     public void setRight(int right) {
-        if (this.left > right) {
-            throw new IllegalArgumentException();
-        }
         this.right = right;
     }
 
@@ -133,10 +106,6 @@ class Edge {
         newDest.putChild(prevCharacter, newEdge);
 
         return newDest;
-    }
-
-    public int getNumberOfTerminals() {
-        return this.getDest().getNumberOfTerminals();
     }
 
 }
@@ -196,11 +165,7 @@ class Position {
     }
 
     public boolean canSplit() {
-        if (leaveCharacter == null) {
-            return false;
-        }
-        Edge edge = this.getNode().getChild(leaveCharacter);
-        return edge.getRight() > edgePosition;
+        return this.getNode().getChild(leaveCharacter).getRight() > edgePosition;
     }
 
     public Node split() {
@@ -216,14 +181,7 @@ class Position {
     }
 
     Node getNextNode() {
-        if (leaveCharacter == null) {
-            throw new IllegalStateException();
-        }
-        Edge edge = this.getNode().getChild(leaveCharacter);
-        if (edge.getRight() == edgePosition) {
-            return edge.getDest();
-        }
-        throw new IllegalStateException();
+        return this.getNode().getChild(leaveCharacter).getDest();
     }
 
     public void toSuffixLink() {
@@ -234,8 +192,6 @@ class Position {
         Node result = this.getNode();
         if (hasNextNode()) {
             result = getNextNode();
-        } else if (!isNodePosition()) {
-            throw new IllegalStateException();
         }
 
         result.putChild(source.charAt(index), index, source.length() - 1);
@@ -344,8 +300,6 @@ class SuffixTreeFactory {
             } else {
                 if (currentPosition.hasNextNode()) {
                     lastNode.setSuffixLink(currentPosition.getNextNode());
-                } else {
-                    lastNode.setSuffixLink(currentPosition.getNode());
                 }
                 if (currentPosition.canMove(str.charAt(currentIndex))) {
                     currentPosition.move(str.charAt(currentIndex));
@@ -354,10 +308,7 @@ class SuffixTreeFactory {
                 currentPosition.putChild(currentIndex);
                 if (currentPosition.hasNextNode()) {
                     lastNode = currentPosition.getNextNode();
-                } else {
-                    lastNode = currentPosition.getNode();
                 }
-
             }
             moveToSuffixLink(currentPosition, root);
         }
