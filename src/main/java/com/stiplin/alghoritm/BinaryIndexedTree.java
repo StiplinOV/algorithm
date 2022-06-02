@@ -1,4 +1,4 @@
-package com.stiplin.alghoritms;
+package com.stiplin.alghoritm;
 
 public class BinaryIndexedTree {
 

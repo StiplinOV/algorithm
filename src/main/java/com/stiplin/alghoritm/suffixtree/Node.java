@@ -1,4 +1,4 @@
-package com.stiplin.alghoritms.suffixtree;
+package com.stiplin.alghoritm.suffixtree;
 
 
 import java.util.HashMap;

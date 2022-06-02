@@ -1,6 +1,6 @@
-package com.stiplin.alghoritms.suffixtree;
+package com.stiplin.alghoritm.suffixtree;
 
-import com.stiplin.alghoritms.suffixtree.source.Source;
+import com.stiplin.alghoritm.suffixtree.source.Source;
 
 public class Position<T> {
 

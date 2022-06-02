@@ -1,4 +1,4 @@
-package com.stiplin.alghoritms.suffixtree.source;
+package com.stiplin.alghoritm.suffixtree.source;
 
 public class StringSource implements Source<Character> {
 

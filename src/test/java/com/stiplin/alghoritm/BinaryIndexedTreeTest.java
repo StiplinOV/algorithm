@@ -1,4 +1,4 @@
-package com.stiplin.alghoritms;
+package com.stiplin.alghoritm;
 
 
 import org.junit.jupiter.api.Assertions;
