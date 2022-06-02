@@ -1,31 +1,33 @@
 package com.stiplin.alghoritms.suffixtree;
 
-public class Position {
+import com.stiplin.alghoritms.suffixtree.source.Source;
 
-    private final String source;
+public class Position<T> {
 
-    private Node node;
+    private final Source<T> source;
 
-    private Character leaveCharacter;
+    private Node<T> node;
+
+    private T leaveCharacter;
 
     private int edgePosition;
 
-    Position(String source, Node node, Character leaveCharacter, int edgePosition) {
+    Position(Source<T> source, Node<T> node, T leaveCharacter, int edgePosition) {
         this.source = source;
         this.node = node;
         this.leaveCharacter = leaveCharacter;
         this.edgePosition = edgePosition;
     }
 
-    public Node getNode() {
+    public Node<T> getNode() {
         return node;
     }
 
-    public Character getLeaveCharacter() {
+    public T getLeaveCharacter() {
         return leaveCharacter;
     }
 
-    Edge getEdge() {
+    Edge<T> getEdge() {
         return this.node.getChild(leaveCharacter);
     }
 
@@ -37,18 +39,18 @@ public class Position {
         return leaveCharacter == null;
     }
 
-    boolean canMove(char character) {
+    boolean canMove(T element) {
         if (leaveCharacter == null) {
-            return node.hasChild(character);
+            return node.hasChild(element);
         } else {
             if (hasNextNode()) {
-                return new Position(source, this.getNextNode(), null, 0).canMove(character);
+                return new Position<T>(source, this.getNextNode(), null, 0).canMove(element);
             }
-            return source.charAt(edgePosition + 1) == character;
+            return source.get(edgePosition + 1) == element;
         }
     }
 
-    public void setNode(Node node) {
+    public void setNode(Node<T> node) {
         this.node = node;
         this.leaveCharacter = null;
         this.edgePosition = 0;
@@ -58,19 +60,19 @@ public class Position {
         return this.getNode().getChild(leaveCharacter).getRight() > edgePosition;
     }
 
-    public Node split() {
-        return this.getEdge().split(source.charAt(this.getEdgePosition() + 1), this.getEdgePosition());
+    public Node<T> split() {
+        return this.getEdge().split(source.get(this.getEdgePosition() + 1), this.getEdgePosition());
     }
 
     boolean hasNextNode() {
         if (leaveCharacter == null) {
             return false;
         }
-        Edge edge = this.getNode().getChild(leaveCharacter);
+        Edge<T> edge = this.getNode().getChild(leaveCharacter);
         return edge.getRight() == edgePosition;
     }
 
-    Node getNextNode() {
+    Node<T> getNextNode() {
         return this.getNode().getChild(leaveCharacter).getDest();
     }
 
@@ -79,12 +81,12 @@ public class Position {
     }
 
     void putChild(int index) {
-        Node result = this.getNode();
+        Node<T> result = this.getNode();
         if (hasNextNode()) {
             result = getNextNode();
         }
 
-        result.putChild(source.charAt(index), index, source.length() - 1);
+        result.putChild(source.get(index), index, source.size() - 1);
     }
 
     void moveTo(int indexFrom, int indexTo) {
@@ -92,12 +94,12 @@ public class Position {
         int currentCharPosition = indexFrom;
         while (remainingShifts != 0) {
             if (leaveCharacter == null) {
-                this.move(source.charAt(currentCharPosition));
+                this.move(source.get(currentCharPosition));
                 remainingShifts -= 1;
             } else {
-                Edge edge = node.getChild(leaveCharacter);
+                Edge<T> edge = node.getChild(leaveCharacter);
                 if (edge.getRight() == edgePosition) {
-                    this.move(source.charAt(currentCharPosition));
+                    this.move(source.get(currentCharPosition));
                     remainingShifts -= 1;
                 } else {
                     if (edge.getRight() - edgePosition > remainingShifts) {
@@ -113,17 +115,17 @@ public class Position {
         }
     }
 
-    void move(char character) {
+    void move(T element) {
         if (leaveCharacter == null) {
-            leaveCharacter = character;
-            edgePosition = node.getChild(character).getLeft();
+            leaveCharacter = element;
+            edgePosition = node.getChild(element).getLeft();
         } else {
-            Edge edge = node.getChild(leaveCharacter);
+            Edge<T> edge = node.getChild(leaveCharacter);
             if (edge.getRight() > edgePosition) {
                 edgePosition++;
             } else {
                 setNode(edge.getDest());
-                leaveCharacter = character;
+                leaveCharacter = element;
                 edgePosition = edge.getDest().getChild(leaveCharacter).getLeft();
             }
         }

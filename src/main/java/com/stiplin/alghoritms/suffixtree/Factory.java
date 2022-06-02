@@ -1,15 +1,17 @@
 package com.stiplin.alghoritms.suffixtree;
 
+import com.stiplin.alghoritms.suffixtree.source.StringSource;
+
 class Factory {
 
-    public Node buildSuffixTree(String str) {
+    public Node<Character> buildSuffixTree(String str) {
         //TODO string concatenation is noneffective. need refactoring
         return buildSuffixTree(str + '$', '$');
     }
 
-    public Node buildSuffixTree(String str, Object o) {
-        Node root = new Node();
-        Position currentPosition = new Position(str, root, null, 0);
+    public Node<Character> buildSuffixTree(String str, Object o) {
+        Node<Character> root = new Node<>();
+        Position<Character> currentPosition = new Position<>(new StringSource(str), root, null, 0);
 
         for (int i = 0; i < str.length(); i++) {
             addSymbol(str, i, root, currentPosition);
@@ -18,7 +20,7 @@ class Factory {
         return root;
     }
 
-    public void addSymbol(String source, int symbolPosition, Node root, Position currentPosition) {
+    public void addSymbol(String source, int symbolPosition, Node<Character> root, Position<Character> currentPosition) {
         char currentChar = source.charAt(symbolPosition);
         if (currentPosition.canMove(currentChar)) {
             currentPosition.move(currentChar);
@@ -41,18 +43,24 @@ class Factory {
                     }
                 }
             } else {
-                Node newNode = currentPosition.split();
+                Node<Character> newNode = currentPosition.split();
                 newNode.putChild(currentChar, symbolPosition, source.length() - 1);
                 createSuffixLinks(source, symbolPosition, currentPosition, newNode, root);
             }
         }
     }
 
-    private void createSuffixLinks(String str, int currentIndex, Position currentPosition, Node lastNode, Node root) {
+    private void createSuffixLinks(
+            String str,
+            int currentIndex,
+            Position<Character> currentPosition,
+            Node<Character> lastNode,
+            Node<Character> root
+    ) {
         moveToSuffixLink(currentPosition, root);
         while (!currentPosition.isNodePosition() || currentPosition.getNode() != root) {
             if (currentPosition.canSplit()) {
-                Node newNode = currentPosition.split();
+                Node<Character> newNode = currentPosition.split();
                 lastNode.setSuffixLink(newNode);
                 lastNode = newNode;
                 newNode.putChild(str.charAt(currentIndex), currentIndex, str.length() - 1);
@@ -84,7 +92,7 @@ class Factory {
         }
     }
 
-    private void moveToSuffixLink(Position currentPosition, Node root) {
+    private void moveToSuffixLink(Position<Character> currentPosition, Node<Character> root) {
         if (currentPosition.getNode() == root) {
             if (currentPosition.getEdge().getLength() == 1) {
                 currentPosition.setNode(root);

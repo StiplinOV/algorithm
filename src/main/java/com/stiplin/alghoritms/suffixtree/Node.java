@@ -5,25 +5,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Node {
+public class Node<T> {
 
-    private final Map<Character, Edge> children = new HashMap<>();
+    private final Map<T, Edge<T>> children = new HashMap<>();
 
-    private Node suffixLink;
+    private Node<T> suffixLink;
 
-    boolean hasChild(char character) {
+    boolean hasChild(T character) {
         return children.containsKey(character);
     }
 
-    Edge getChild(char character) {
+    Edge<T> getChild(T character) {
         return children.get(character);
     }
 
-    void putChild(char character, int left, int right) {
-        this.putChild(character, new Edge(left, right));
+    void putChild(T character, int left, int right) {
+        this.putChild(character, new Edge<>(left, right));
     }
 
-    void putChild(char character, Edge child) {
+    void putChild(T character, Edge<T> child) {
         this.children.put(character, child);
     }
 
@@ -31,11 +31,11 @@ public class Node {
         return this.suffixLink != null;
     }
 
-    Node getSuffixLink() {
+    Node<T> getSuffixLink() {
         return this.suffixLink;
     }
 
-    public void setSuffixLink(Node suffixLink) {
+    public void setSuffixLink(Node<T> suffixLink) {
         this.suffixLink = suffixLink;
     }
 
@@ -43,11 +43,11 @@ public class Node {
         return this.children.isEmpty();
     }
 
-    public Map<Character, Edge> getChildren() {
+    public Map<T, Edge<T>> getChildren() {
         return children;
     }
 
-    public Set<Character> characters() {
+    public Set<T> characters() {
         return children.keySet();
     }
 

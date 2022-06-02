@@ -1,5 +1,6 @@
 package com.stiplin.alghoritms.suffixtree;
 
+import com.stiplin.alghoritms.suffixtree.source.StringSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,14 +11,14 @@ public class SuffixTreeTest {
     @Test
     public void testaaaaa() {
         Factory factory = new Factory();
-        Node root = factory.buildSuffixTree("aaaaa");
+        Node<Character> root = factory.buildSuffixTree("aaaaa");
 
         Assertions.assertEquals(2, root.characters().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('$'));
         Assertions.assertFalse(root.hasSuffixLink());
 
-        Edge edge = root.getChild('$');
+        Edge<Character> edge = root.getChild('$');
         Assertions.assertEquals(5, edge.getLeft());
         Assertions.assertEquals(5, edge.getRight());
         Assertions.assertTrue(edge.getDest().isTerminal());
@@ -25,7 +26,7 @@ public class SuffixTreeTest {
         edge = root.getChild('a');
         Assertions.assertEquals(0, edge.getLeft());
         Assertions.assertEquals(0, edge.getRight());
-        Node node1 = edge.getDest();
+        Node<Character> node1 = edge.getDest();
 
         Assertions.assertEquals(2, node1.characters().size());
         Assertions.assertTrue(node1.hasChild('a'));
@@ -40,7 +41,7 @@ public class SuffixTreeTest {
         edge = node1.getChild('a');
         Assertions.assertEquals(1, edge.getLeft());
         Assertions.assertEquals(1, edge.getRight());
-        Node node2 = edge.getDest();
+        Node<Character> node2 = edge.getDest();
 
         Assertions.assertEquals(2, node2.characters().size());
         Assertions.assertTrue(node2.hasChild('a'));
@@ -55,7 +56,7 @@ public class SuffixTreeTest {
         edge = node2.getChild('a');
         Assertions.assertEquals(2, edge.getLeft());
         Assertions.assertEquals(2, edge.getRight());
-        Node node3 = edge.getDest();
+        Node<Character> node3 = edge.getDest();
 
         Assertions.assertEquals(2, node3.characters().size());
         Assertions.assertTrue(node3.hasChild('a'));
@@ -70,7 +71,7 @@ public class SuffixTreeTest {
         edge = node3.getChild('a');
         Assertions.assertEquals(3, edge.getLeft());
         Assertions.assertEquals(3, edge.getRight());
-        Node node4 = edge.getDest();
+        Node<Character> node4 = edge.getDest();
 
         Assertions.assertEquals(2, node4.characters().size());
         Assertions.assertTrue(node4.hasChild('a'));
@@ -91,7 +92,7 @@ public class SuffixTreeTest {
     @Test
     public void testabrashvabracadabra() {
         Factory factory = new Factory();
-        Node root = factory.buildSuffixTree("abrashvabracadabra");
+        Node<Character> root = factory.buildSuffixTree("abrashvabracadabra");
 
         Assertions.assertEquals(9, root.characters().size());
         Assertions.assertTrue(root.hasChild('a'));
@@ -105,7 +106,7 @@ public class SuffixTreeTest {
         Assertions.assertTrue(root.hasChild('$'));
         Assertions.assertFalse(root.hasSuffixLink());
 
-        Edge edge = root.getChild('$');
+        Edge<Character> edge = root.getChild('$');
         Assertions.assertEquals(18, edge.getLeft());
         Assertions.assertEquals(18, edge.getRight());
         Assertions.assertTrue(edge.getDest().isTerminal());
@@ -135,9 +136,9 @@ public class SuffixTreeTest {
         Assertions.assertEquals(18, edge.getRight());
         Assertions.assertTrue(edge.getDest().isTerminal());
 
-        Node nodeA = root.getChild('a').getDest();
-        Node nodeB = root.getChild('b').getDest();
-        Node nodeR = root.getChild('r').getDest();
+        Node<Character> nodeA = root.getChild('a').getDest();
+        Node<Character> nodeB = root.getChild('b').getDest();
+        Node<Character> nodeR = root.getChild('r').getDest();
         Assertions.assertEquals(5, nodeA.characters().size());
         Assertions.assertTrue(nodeA.hasChild('b'));
         Assertions.assertTrue(nodeA.hasChild('s'));
@@ -172,7 +173,7 @@ public class SuffixTreeTest {
         Assertions.assertFalse(edge.getDest().isTerminal());
         Assertions.assertEquals(nodeA.getSuffixLink(), root);
 
-        Node nodeAb = edge.getDest();
+        Node<Character> nodeAb = edge.getDest();
         Assertions.assertEquals(3, nodeR.characters().size());
         Assertions.assertTrue(nodeAb.hasChild('s'));
         Assertions.assertTrue(nodeAb.hasChild('c'));
@@ -240,17 +241,17 @@ public class SuffixTreeTest {
     @Test
     public void testababbabbba$() {
         Factory factory = new Factory();
-        String sting = "ababbabbba$";
-        Node root = new Node();
+        String string = "ababbabbba$";
+        Node<Character> root = new Node<>();
 
-        Position currentPosition = new Position(sting, root, null, 0);
+        Position<Character> currentPosition = new Position<>(new StringSource(string), root, null, 0);
 
         //Add 'a'
-        factory.addSymbol(sting, 0, root, currentPosition);
+        factory.addSymbol(string, 0, root, currentPosition);
         Assertions.assertEquals(1, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertFalse(root.hasSuffixLink());
-        Edge edge = root.getChild('a');
+        Edge<Character> edge = root.getChild('a');
         Assertions.assertEquals(0, edge.getLeft());
         Assertions.assertEquals(10, edge.getRight());
         Assertions.assertTrue(edge.getDest().isTerminal());
@@ -259,7 +260,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(0, currentPosition.getEdgePosition());
 
         //Add 'ab'
-        factory.addSymbol(sting, 1, root, currentPosition);
+        factory.addSymbol(string, 1, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -279,7 +280,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(0, currentPosition.getEdgePosition());
 
         //Add symbol 'aba'
-        factory.addSymbol(sting, 2, root, currentPosition);
+        factory.addSymbol(string, 2, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -299,7 +300,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(0, currentPosition.getEdgePosition());
 
         //Add symbol 'abab'
-        factory.addSymbol(sting, 3, root, currentPosition);
+        factory.addSymbol(string, 3, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -319,7 +320,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(1, currentPosition.getEdgePosition());
 
         //Add symbol 'ababb'
-        factory.addSymbol(sting, 4, root, currentPosition);
+        factory.addSymbol(string, 4, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -327,11 +328,11 @@ public class SuffixTreeTest {
         edge = root.getChild('a');
         Assertions.assertEquals(0, edge.getLeft());
         Assertions.assertEquals(1, edge.getRight());
-        Node nodeab = edge.getDest();
+        Node<Character> nodeab = edge.getDest();
         edge = root.getChild('b');
         Assertions.assertEquals(1, edge.getLeft());
         Assertions.assertEquals(1, edge.getRight());
-        Node nodeb = edge.getDest();
+        Node<Character> nodeb = edge.getDest();
 
         Assertions.assertFalse(nodeab.isTerminal());
         Assertions.assertTrue(nodeab.hasSuffixLink());
@@ -370,7 +371,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(0, currentPosition.getEdgePosition());
 
         //Add symbol 'ababba'
-        factory.addSymbol(sting, 5, root, currentPosition);
+        factory.addSymbol(string, 5, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -421,7 +422,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(2, currentPosition.getEdgePosition());
 
         //Add symbol 'ababbab'
-        factory.addSymbol(sting, 6, root, currentPosition);
+        factory.addSymbol(string, 6, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -472,7 +473,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(3, currentPosition.getEdgePosition());
 
         //Add symbol 'ababbabb'
-        factory.addSymbol(sting, 7, root, currentPosition);
+        factory.addSymbol(string, 7, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -523,7 +524,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(4, currentPosition.getEdgePosition());
 
         //Add symbol 'ababbabbb'
-        factory.addSymbol(sting, 8, root, currentPosition);
+        factory.addSymbol(string, 8, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -556,15 +557,15 @@ public class SuffixTreeTest {
         Assertions.assertEquals(10, edge.getRight());
         Assertions.assertTrue(edge.getDest().isTerminal());
         edge = nodeab.getChild('b');
-        Node nodeabb = edge.getDest();
+        Node<Character> nodeabb = edge.getDest();
         Assertions.assertEquals(4, edge.getLeft());
         Assertions.assertEquals(4, edge.getRight());
         edge = nodeb.getChild('a');
-        Node nodebabb = edge.getDest();
+        Node<Character> nodebabb = edge.getDest();
         Assertions.assertEquals(2, edge.getLeft());
         Assertions.assertEquals(4, edge.getRight());
         edge = nodeb.getChild('b');
-        Node nodebb = edge.getDest();
+        Node<Character> nodebb = edge.getDest();
         Assertions.assertEquals(4, edge.getLeft());
         Assertions.assertEquals(4, edge.getRight());
 
@@ -618,7 +619,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(4, currentPosition.getEdgePosition());
 
         //Add symbol 'ababbabbba'
-        factory.addSymbol(sting, 9, root, currentPosition);
+        factory.addSymbol(string, 9, root, currentPosition);
         Assertions.assertEquals(2, root.getChildren().size());
         Assertions.assertTrue(root.hasChild('a'));
         Assertions.assertTrue(root.hasChild('b'));
@@ -712,7 +713,7 @@ public class SuffixTreeTest {
         Assertions.assertEquals(Character.valueOf('a'), currentPosition.getLeaveCharacter());
         Assertions.assertEquals(5, currentPosition.getEdgePosition());
 
-        factory.addSymbol(sting, 10, root, currentPosition);
+        factory.addSymbol(string, 10, root, currentPosition);
     }
 
 }
