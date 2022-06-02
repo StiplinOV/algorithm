@@ -1,4 +1,4 @@
-package com.stiplin.alghoritm.suffixtree.source;
+package com.stiplin.algorithm.suffixtree.source;
 
 public class ArraySource<T> implements Source<T> {
 

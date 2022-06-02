@@ -1,7 +1,7 @@
-package com.stiplin.alghoritm.suffixtree;
+package com.stiplin.algorithm.suffixtree;
 
-import com.stiplin.alghoritm.DataStructureFactory;
-import com.stiplin.alghoritm.suffixtree.source.StringSource;
+import com.stiplin.algorithm.DataStructureFactory;
+import com.stiplin.algorithm.suffixtree.source.StringSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,8 @@
-package com.stiplin.alghoritm;
+package com.stiplin.algorithm;
 
-import com.stiplin.alghoritm.suffixtree.Node;
-import com.stiplin.alghoritm.suffixtree.SuffixTreeFactory;
-import com.stiplin.alghoritm.suffixtree.source.StringSource;
+import com.stiplin.algorithm.suffixtree.Node;
+import com.stiplin.algorithm.suffixtree.SuffixTreeFactory;
+import com.stiplin.algorithm.suffixtree.source.StringSource;
 
 public class DataStructureFactory {
 

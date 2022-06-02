@@ -1,8 +1,8 @@
-package com.stiplin.alghoritm.suffixtree;
+package com.stiplin.algorithm.suffixtree;
 
-import com.stiplin.alghoritm.suffixtree.source.CompositeSource;
-import com.stiplin.alghoritm.suffixtree.source.SingletonSource;
-import com.stiplin.alghoritm.suffixtree.source.Source;
+import com.stiplin.algorithm.suffixtree.source.CompositeSource;
+import com.stiplin.algorithm.suffixtree.source.SingletonSource;
+import com.stiplin.algorithm.suffixtree.source.Source;
 
 public class SuffixTreeFactory {
 
